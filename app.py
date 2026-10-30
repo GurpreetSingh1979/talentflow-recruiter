@@ -511,6 +511,9 @@ function handleFileUpload(e) {
     })
     .then(r => r.json())
     .then(data => {
+        // Reset file input so selecting the same file again triggers change event
+        e.target.value = '';
+
         if (!data.success) {
             showBanner('Upload error: ' + data.error, 'error');
             return;
@@ -519,6 +522,7 @@ function handleFileUpload(e) {
         autoLoad();
     })
     .catch(err => {
+        e.target.value = '';
         showBanner('Upload failed: ' + err.message, 'error');
     });
 }
@@ -833,18 +837,29 @@ def api_screen_candidates():
 
     candidates = []
     try:
-        with open(latest_file, "r", encoding="utf-8", errors="ignore") as f:
+        with open(latest_file, "r", encoding="utf-8-sig", errors="ignore") as f:
             reader = csv.DictReader(f)
+            # Normalize fieldnames mapping to handle various column names and casing
+            fn_map = {f.strip().lower(): f for f in (reader.fieldnames or []) if f}
+            def get_val(row_dict, *keys):
+                for k in keys:
+                    actual = fn_map.get(k.lower())
+                    if actual and row_dict.get(actual):
+                        return row_dict[actual].strip()
+                    if k in row_dict and row_dict[k]:
+                        return row_dict[k].strip()
+                return ""
+
             for row in reader:
-                name = row.get("Name", "").strip()
+                name = get_val(row, "Name", "Candidate Name", "Candidate", "Full Name")
                 if not name:
                     continue
 
-                role = row.get("Current_Role", row.get("Role", "")).strip()
-                exp = row.get("Experience", "").strip()
-                loc = row.get("Location", "").strip()
-                skills_raw = row.get("Key_Skills", row.get("Skills", "")).strip()
-                notice = row.get("Notice_Period", "").strip()
+                role = get_val(row, "Current_Role", "Current Role", "Current_Role_Company", "Role", "Designation", "Job Title")
+                exp = get_val(row, "Experience", "Total Experience", "Exp", "Work Experience")
+                loc = get_val(row, "Location", "Current Location", "City")
+                skills_raw = get_val(row, "Key_Skills", "Key Skills", "Skills", "Matched_JD_Skills", "Skillset")
+                notice = get_val(row, "Notice_Period", "Notice Period", "Notice")
 
                 exp_years = 0.0
                 m = re.search(r"(\d+)y\s*(\d*)m?", exp, re.I)
@@ -958,3 +973,11 @@ def api_find_candidate_contact():
         "email": email or "Not found publicly",
         "linkedin": linkedin
     })
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    print(f"\n=======================================================")
+    print(f" TalentFlow Recruiter Hub starting on http://127.0.0.1:{port}")
+    print(f"=======================================================\n")
+    app.run(host="0.0.0.0", port=port, debug=False)
+

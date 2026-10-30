@@ -250,6 +250,9 @@ HTML_TEMPLATE = """
             <p>Automated Candidate Sourcing, Duplicate Lockout Guard & Intent Radar for Recruitment Teams</p>
         </div>
         <div class="header-badges">
+            <button onclick="openInstallModal()" class="badge-pill" style="background:#4338ca;color:#fff;border:none;cursor:pointer;">
+                🚀 Install 100+ Naukri Extractor
+            </button>
             <span class="badge-pill badge-zero">🛡️ 0 Recruiter Credits Used</span>
             <span class="badge-pill badge-owner">👤 Designed by Gurpreet Singh</span>
         </div>
@@ -356,8 +359,54 @@ HTML_TEMPLATE = """
     </div>
 </div>
 
+<div id="installModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:14px;max-width:650px;width:90%;padding:28px;box-shadow:0 20px 40px rgba(0,0,0,0.3);position:relative;">
+        <h2 style="font-size:20px;font-weight:800;color:#0f172a;margin-bottom:8px;">🚀 1-Click Naukri Extractor Setup</h2>
+        <p style="font-size:13px;color:#64748b;margin-bottom:20px;">Share this button with all 20 recruiters. They just drag it to their bookmarks bar once!</p>
+
+        <div style="background:#f1f5f9;border:2px dashed #cbd5e1;border-radius:10px;padding:20px;text-align:center;margin-bottom:20px;">
+            <p style="font-size:13px;font-weight:600;color:#334155;margin-bottom:12px;">👉 Drag this purple button directly to your Chrome Bookmarks Bar:</p>
+            <a id="dragBookmarklet" href="#" style="background:#4f46e5;color:#fff;padding:12px 24px;border-radius:8px;font-weight:800;font-size:14px;text-decoration:none;display:inline-flex;align-items:center;gap:8px;box-shadow:0 4px 12px rgba(79,70,229,0.4);cursor:grab;">
+                ⚡ Auto-Crawl 100+ Naukri
+            </a>
+        </div>
+
+        <div style="font-size:13px;color:#334155;line-height:1.6;margin-bottom:20px;">
+            <b>How any recruiter uses it:</b><br>
+            1. Open any candidate search on Naukri Resdex.<br>
+            2. Click the <b>⚡ Auto-Crawl 100+ Naukri</b> button on your Chrome bookmarks bar.<br>
+            3. Enter how many pages to crawl (e.g. <code>3</code> for 120 candidates, <code>5</code> for 200).<br>
+            4. Upload the downloaded CSV to this portal to screen for 80-100% matches & client lockouts.
+        </div>
+
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+            <button onclick="copyCodeFallback()" class="btn" style="background:#0f172a;color:#fff;padding:8px 16px;font-size:12px;">📋 Copy Code Manually</button>
+            <button onclick="closeInstallModal()" class="btn btn-primary" style="padding:8px 20px;">Done</button>
+        </div>
+    </div>
+</div>
+
 <script>
-var currentCandidates = [];
+var bookmarkletCode = "";
+fetch('/api/get-bookmarklet')
+    .then(r => r.json())
+    .then(d => {
+        bookmarkletCode = d.code;
+        document.getElementById('dragBookmarklet').href = bookmarkletCode;
+    });
+
+function openInstallModal() {
+    document.getElementById('installModal').style.display = 'flex';
+}
+function closeInstallModal() {
+    document.getElementById('installModal').style.display = 'none';
+}
+function copyCodeFallback() {
+    navigator.clipboard.writeText(bookmarkletCode).then(() => {
+        alert("✅ Extractor code copied to your clipboard!");
+    });
+}
+
 var currentJD = '';
 
 function showBanner(text, type) {
@@ -564,6 +613,15 @@ window.addEventListener('DOMContentLoaded', function() {
 def index():
     jds = get_available_jds()
     return render_template_string(HTML_TEMPLATE, jds=jds)
+
+@app.route("/api/get-bookmarklet", methods=["GET"])
+def api_get_bookmarklet():
+    b_path = os.path.join(BASE_DIR, "bookmarklet.txt")
+    code = ""
+    if os.path.exists(b_path):
+        with open(b_path, "r", encoding="utf-8") as f:
+            code = f.read().strip()
+    return jsonify({"code": code})
 
 @app.route("/api/upload-csv", methods=["POST"])
 def upload_csv():

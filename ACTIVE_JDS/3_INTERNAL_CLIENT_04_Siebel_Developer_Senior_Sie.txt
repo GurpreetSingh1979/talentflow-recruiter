@@ -1,0 +1,32 @@
+Target Client: INTERNAL_CLIENT
+Role: 04 Siebel Developer Senior Siebel Developer Siebel Lead
+Experience: 10 to 14 Years
+Mandatory Skills: SQL
+
+Job Description Details:
+Job Description
+Page 1
+JOB DESCRIPTION
+Siebel Developer / Senior Siebel Developer / Siebel
+Lead
+STL
+Role Summary
+Design, build, configure, integrate, and support Siebel CRM solutions. Own technical delivery, resolve complex issues,
+and collaborate with business, QA, and integration teams.
+Key Responsibilities
+  Configure Siebel business components, business objects, applets, views, screens, user properties, and other
+ repository objects.
+ Develop and maintain Siebel workflows, business services, eScript, and validation logic.
+  Design and troubleshoot inbound and outbound integrations using EAI, integration objects, data maps, SOAP/REST
+ services, XML, and JSON.
+ Plan and execute EIM data loads, IFB runs, updates, exports, and migration activities; investigate failed batches and
+ reconcile results.
+ Prepare technical designs and effort estimates, perform code reviews, and support deployments throughout the SDLC.
+  Diagnose application, integration, and performance issues using Siebel logs and Oracle SQL/PLSQL.
+  Mentor developers and coordinate with QA, business analysts, and external-system teams to resolve defects and
+ deliver changes.
+Required Experience & Skills
+  10+ years of Siebel CRM development experience, with strong hands-on CSW, EAI, and EIM skills.
+  Deep knowledge of Siebel Tools or Web Tools, Workspaces, the Siebel data model, workflows, business services, and
+ eScript.
+ Experience designing reliable integrations, including service configuration, data

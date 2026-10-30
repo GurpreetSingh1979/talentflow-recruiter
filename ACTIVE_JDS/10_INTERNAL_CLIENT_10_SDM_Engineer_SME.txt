@@ -1,0 +1,23 @@
+Target Client: INTERNAL_CLIENT
+Role: 10 SDM Engineer SME
+Experience: 3 to 8 Years
+Mandatory Skills: Engineer
+
+Job Description Details:
+Job Description
+Page 1
+JOB DESCRIPTION
+SDM Engineer / SME
+STL
+Role Summary
+Support deployment-focused work in subscriber data management technologies, with expertise in One-NDS, SDL, Nokia
+HSS, and related telecom subscriber data platforms.
+Key Skills
+  Home Subscriber Server (HSS), HLR, UDM (Unified Data Management), AUSF, EIR, and SDL.
+  Deep understanding of subscriber data provisioning and database architecture.
+  Knowledge of Diameter protocols, including Sh, Cx, and Dx, and MAP.
+ 
+Mandatory Experience & Screening Notes
+  Deployment experience is mandatory.
+  Do not consider profiles from an Operations-only background.
+ 

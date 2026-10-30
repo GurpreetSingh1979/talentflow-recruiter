@@ -1,0 +1,5 @@
+Target Client: TECH_MAHINDRA
+Role: Data Engineer / PySpark
+Experience: 3 to 7 Years
+Mandatory Skills: Python, PySpark, Databricks, SQL, Azure Data Factory
+Notice Period: Immediate to 15 Days

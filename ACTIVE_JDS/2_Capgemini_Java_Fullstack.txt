@@ -1,0 +1,5 @@
+Target Client: CAPGEMINI
+Role: Java FullStack Developer
+Experience: 5 to 9 Years
+Mandatory Skills: Java, Spring Boot, Microservices, Angular, AWS, Docker
+Notice Period: Immediate to 30 Days

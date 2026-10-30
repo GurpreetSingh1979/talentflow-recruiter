@@ -1,0 +1,33 @@
+Target Client: INTERNAL_CLIENT
+Role: 08 ADP WorkForce Suite Integration Engineer
+Experience: 3 to 8 Years
+Mandatory Skills: SQL
+
+Job Description Details:
+Job Description
+Page 1
+JOB DESCRIPTION
+ADP WorkForce Suite Integration Engineer
+STL — Fresenius Medical Care
+Role Summary
+Design, configure, test, deploy, and support hands-on interfaces between ADP WorkForce Suite and Workday, ADP, and
+other connected HR, payroll, scheduling, reporting, identity, and enterprise platforms.
+Experience Requirements
+  Approximately 10 years of relevant integration, HR technology, payroll technology, or enterprise application
+ experience.
+ Demonstrable hands-on experience creating or supporting integrations within ADP WorkForce Suite / WorkForce
+ Software Time.
+ Experience with time-and-attendance inputs and outputs, including employee, organizational, time-entry, schedule,
+ balance, activity, and payroll-related data.
+ Experience with integration design, field mapping, transformation rules, reconciliation, exception handling, and
+ production monitoring.
+ Experience supporting integrations through testing, deployment, hypercare, and production stabilization.
+  Programming experience using JavaScript.
+  Experience with SQL and complex queries.
+ 
+Mandatory Training & Product Credentials
+  Successful completion or valid certification in Interfaces Fundamentals (INTERFACES101); evidence must be provided
+ before profile submission.
+ Interfaces Configuration (INTERFACES201) is strongly preferred.
+  INTERFACES101 covers standard time-and-attendance interfaces and basic imports/exports, including HR,
+ bank-balance, activity-tracking, time-entry

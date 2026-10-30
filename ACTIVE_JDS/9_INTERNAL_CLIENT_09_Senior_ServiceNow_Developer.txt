@@ -1,0 +1,29 @@
+Target Client: INTERNAL_CLIENT
+Role: 09 Senior ServiceNow Developer Strategic Portfolio Management SPM
+Experience: 6 to 10 Years
+Mandatory Skills: ServiceNow
+
+Job Description Details:
+Job Description
+Page 1
+JOB DESCRIPTION
+Senior ServiceNow Developer — Strategic
+Portfolio Management (SPM)
+STL
+Role Summary
+Lead the design, development, and implementation of enterprise-grade ServiceNow SPM solutions spanning Demand
+Management, Project & Portfolio Management, Agile Development, Resource Management, and financial governance.
+Key Responsibilities
+  Design, develop, and implement ServiceNow SPM solutions covering Demand, PPM, Agile Development, Resource
+ Management, and Financial Planning.
+ Configure and customize SPM modules for portfolio visibility, prioritization, and value realization.
+  Ensure scalable, configurable solutions aligned with ServiceNow best practices and roadmap recommendations.
+  Partner with business leaders, PMOs, finance, and delivery teams to translate strategic objectives into SPM
+ capabilities.
+ Facilitate workshops and stakeholder interviews to identify pain points, maturity gaps, and optimization opportunities.
+  Identify automation and continuous-improvement opportunities across portfolio, demand, and delivery processes.
+  Standardize intake, prioritization, funding, and execution workflows; establish governance and reporting controls.
+  Develop advanced configurations including flows, workflows, business rules, UI policies, client/server scripts, and
+ integrations.
+ Provide technical leadership and mentor junior developers and administrators.
+  Support release planning, upgrades, UAT, production monitoring, issue resolutio

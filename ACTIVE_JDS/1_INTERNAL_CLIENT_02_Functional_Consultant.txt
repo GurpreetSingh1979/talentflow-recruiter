@@ -1,0 +1,31 @@
+Target Client: INTERNAL_CLIENT
+Role: 02 Functional Consultant
+Experience: 3 to 8 Years
+Mandatory Skills: Functional, Consultant
+
+Job Description Details:
+Job Description
+Page 1
+JOB DESCRIPTION
+Functional Consultant
+STL
+Role Summary
+Drive enterprise Icertis product implementations, from requirements and functional design through configuration,
+deployment, and collaboration with engineering, quality assurance, and support teams.
+Key Responsibilities
+  Drive execution of Icertis product implementations for enterprise customers across industries in accordance with the
+ Icertis implementation methodology and agreed scope, schedule, and effort.
+ Conceptualize and formulate best-of-breed solutions in collaboration with business stakeholders to address
+ implementation objectives.
+ Drive requirement gathering and functional design; work closely with Engineering, Quality Assurance, and Support
+ across multiple engagements.
+ Own system configuration and deployment activities across multiple engagements.
+  Contribute to consulting capability building within the Professional Services group.
+  Provide customer and implementation feedback to contribute to the Icertis product roadmap.
+ 
+Required Experience & Qualifications
+  Prior experience implementing Contract Management or Supply Chain applications is highly preferred.
+  Experience in at least three full-lifecycle enterprise application implementations in a project manager or project lead
+ capacity.
+ Ability to interpret trends and patterns in available data and formulate effective strategies and actions.
+  Engineering degree from a reputed institute; an MBA in a related field i

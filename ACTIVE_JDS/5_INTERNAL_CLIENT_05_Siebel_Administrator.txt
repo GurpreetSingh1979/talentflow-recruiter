@@ -1,0 +1,30 @@
+Target Client: INTERNAL_CLIENT
+Role: 05 Siebel Administrator
+Experience: 3 to 8 Years
+Mandatory Skills: Kubernetes, Docker
+
+Job Description Details:
+Job Description
+Page 1
+JOB DESCRIPTION
+Siebel Administrator
+STL
+Role Summary
+Administer and maintain Siebel environments across development, test, and production, ensuring application availability,
+security, performance, controlled deployments, and reliable production support.
+Key Responsibilities
+  Install, configure, administer, and maintain Siebel environments across development, testing, and production.
+  Manage Siebel Enterprise Server, Gateway, Siebel Servers, Application Interface, server components, and component
+ parameters.
+ Monitor application health, availability, resource utilization, and scheduled jobs; investigate and resolve production
+ incidents.
+ Troubleshoot login failures, session issues, component failures, connectivity problems, and performance issues.
+  Perform deployments, patching, upgrades, configuration migrations, and release activities in accordance with
+ change-management processes.
+ Tune server components, connection settings, and application parameters with development, database, and
+ infrastructure teams.
+ Administer user access, authentication integration, certificates, and platform security settings.
+  Maintain backup and recovery procedures, support disaster-recovery testing, and ensure operational readiness.
+  Support EAI, EIM, web services, integration components, and batch processing.
+  Maintain operational documentation, troubleshooting guides, and root-cause analysis reports.
+  Participate in on-call support and planned main

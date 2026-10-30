@@ -1,0 +1,30 @@
+Target Client: INTERNAL_CLIENT
+Role: 07 SAP FI CO Consultant
+Experience: 3 to 8 Years
+Mandatory Skills: SAP
+
+Job Description Details:
+Job Description
+Page 1
+JOB DESCRIPTION
+SAP FI/CO Consultant
+STL
+Role Summary
+Participate in SAP S/4HANA Finance implementation, enhancement, and support. Translate finance business
+requirements into SAP solutions and serve as a link between finance users and technical teams.
+Key Responsibilities
+  Lead and participate in full-lifecycle SAP implementations, rollouts, and upgrades focused on SAP S/4HANA Finance.
+  Configure and customize FI-GL, FI-AP, FI-AR, FI-AA, FI-BL, CO-CCA, CO-IO, and EC-PCA; CO-PC experience is a
+ significant plus.
+ Analyze business requirements and design and document target (“to-be”) business processes.
+  Recommend scalable SAP solutions aligned with business needs and global standards.
+  Manage integration points between FI/CO, MM, SD, PP, PM, and external systems.
+  Resolve finance-related incidents, perform root-cause analysis, and implement corrective actions.
+  Develop test scenarios, lead UAT, and prepare end-user documentation and training materials.
+  Manage workstreams or small projects, meet delivery commitments, and mentor junior consultants.
+ 
+Required Qualifications & Experience
+  Bachelor’s degree in Finance, Accounting, Business Administration, Information Technology, or a related field.
+  5–8 years of SAP FI/CO consulting experience, including at least one end-to-end full-lifecycle SAP implementation.
+  Mandatory hands-on SAP S/4HANA Finance experience, including areas such as New General Ledger, Asset
+ Accounting, parallel a

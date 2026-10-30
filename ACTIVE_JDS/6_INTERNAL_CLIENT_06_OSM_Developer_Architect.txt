@@ -1,0 +1,32 @@
+Target Client: INTERNAL_CLIENT
+Role: 06 OSM Developer Architect
+Experience: 3 to 8 Years
+Mandatory Skills: Java
+
+Job Description Details:
+Job Description
+Page 1
+JOB DESCRIPTION
+OSM Developer / Architect
+STL
+Role Summary
+Develop and implement Oracle Communications Order and Service Management (OSM) solutions, preferably in the
+telecommunications domain, and translate high-level requirements into effective technical designs and deployments.
+Experience Requirement
+  Minimum 10 years of working experience with OSM 7.3.x and above; telecom-domain experience is preferred.
+ 
+Key Responsibilities & Skills
+  Bring 2–8 years of experience in the IT telecommunications industry, as stated in the source requirement.
+  Demonstrate good knowledge of Communications and OSS domains.
+  Implement solutions involving OSS products such as RODOD, RSDOD, and NRM.
+  Work with implementation technologies including Java, XML, XQuery, web services, WebLogic, and RDBMS.
+  Build code and deploy completed code into development and testing environments.
+  Translate requirements in high-level designs (HLDs) into effective solutions.
+  Prepare HLDs, low-level designs (LLDs), and other project documentation.
+  Have hands-on experience with OSM installation and troubleshoot installation and configuration issues.
+  Work in UNIX/Linux environments and use Unix shell scripts.
+  Understand TMF/eTOM, SID Data Model, and Oracle RODOD/RSDOD solutions.
+  Work independently and collaboratively with strong communication and interpersonal skills.
+ 
+Education
+  BE/BTech/MCA/MTech in Computer Science, Electrical, Electronics, or Telecommunicatio

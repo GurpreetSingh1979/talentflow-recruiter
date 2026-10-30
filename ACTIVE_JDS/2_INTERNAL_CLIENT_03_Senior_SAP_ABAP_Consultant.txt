@@ -1,0 +1,32 @@
+Target Client: INTERNAL_CLIENT
+Role: 03 Senior SAP ABAP Consultant
+Experience: 3 to 8 Years
+Mandatory Skills: SAP
+
+Job Description Details:
+Job Description
+Page 1
+JOB DESCRIPTION
+Senior SAP ABAP Consultant
+STL — Jharsuguda
+Role Summary
+Design, develop, implement, and support technical solutions across the SAP landscape, including S/4HANA
+transformation, system upgrades, integrations, and continuous improvement initiatives.
+Key Responsibilities
+  Analyze functional specifications and design, develop, test, and debug ABAP programs, reports, interfaces,
+ conversions, enhancements, and forms (RICEFW).
+ Develop and adapt code for SAP S/4HANA using CDS views, AMDP, and OData services, following SAP HANA best
+ practices and code restrictions.
+ Design and build interfaces using RFC, BAPI, IDocs, ALE, and SOAP/REST web services. SAP PI/PO or CPI
+ experience is a strong plus.
+ Use User Exits, BAdIs, Enhancement Spots, and SPDD/SPAU strategies to customize SAP standard functionality.
+  Analyze and optimize ABAP performance for SAP HANA, including code pushdown and effective OpenSQL.
+  Develop and maintain output forms using SAPscript, Smart Forms, and Adobe Forms.
+  Develop and maintain SAP workflow rules and processes where required.
+  Collaborate with SAP functional consultants across MM, SD, FI/CO, PP, and related modules.
+  Maintain technical documentation and follow coding standards and change-management procedures.
+  Troubleshoot production issues, perform root-cause analysis, and implement timely fixes.
+ 
+Required Qualifications & Skills
+  5–8 years of hands-on SAP ABAP development experience.
+  Bachelor’

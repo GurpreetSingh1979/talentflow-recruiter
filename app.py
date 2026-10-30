@@ -540,7 +540,9 @@ function renderTable(candidates) {
         '</div>';
 
         var liUrl = c.linkedin || ('https://www.google.com/search?q=' + encodeURIComponent(c.name + ' ' + (c.company || '') + ' site:linkedin.com/in'));
-        var contactQuery = encodeURIComponent(c.name + ' "' + (c.company || '') + '" ("email" OR "phone" OR "contact")');
+        var githubUrl = 'https://www.google.com/search?q=' + encodeURIComponent(c.name + ' site:github.com');
+        var founditUrl = 'https://www.google.com/search?q=' + encodeURIComponent(c.name + ' ' + (c.company || '') + ' site:foundit.in');
+        var contactQuery = encodeURIComponent(c.name + ' "' + (c.company || '') + '" ("email" OR "phone" OR "resume" OR "@gmail.com")');
 
         html += '<tr>' +
             '<td><b style="color:#64748b;">#' + (i + 1) + '</b></td>' +
@@ -561,8 +563,10 @@ function renderTable(candidates) {
             '<td>' + lockBadge + '</td>' +
             '<td>' +
                 '<div class="action-links">' +
-                    '<a class="link-btn link-li" href="' + liUrl + '" target="_blank">🔗 View LinkedIn</a>' +
-                    '<a class="link-btn link-search" href="https://www.google.com/search?q=' + contactQuery + '" target="_blank">✉️ Find Contact Info</a>' +
+                    '<a class="link-btn link-li" href="' + liUrl + '" target="_blank">🔗 LinkedIn Profile</a>' +
+                    '<a class="link-btn link-search" href="' + githubUrl + '" target="_blank">🐙 GitHub / Portfolio</a>' +
+                    '<a class="link-btn link-search" href="' + founditUrl + '" target="_blank">🔍 Other Portals (Foundit)</a>' +
+                    '<a class="link-btn" style="background:#059669;color:#fff;" href="https://www.google.com/search?q=' + contactQuery + '" target="_blank">📞 Phone & Email Dork</a>' +
                 '</div>' +
             '</td>' +
         '</tr>';
@@ -572,8 +576,13 @@ function renderTable(candidates) {
 
 function exportCSV() {
     if (!currentCandidates || currentCandidates.length === 0) return;
-    var csv = 'Rank,Match_Score,Name,Role,Company,Experience,Location,Notice_Period,Readiness_Status,Matched_Skills,All_Skills,Lockout_Status,LinkedIn_URL\\n';
+    var csv = 'Rank,Match_Score,Name,Role,Company,Experience,Location,Notice_Period,Readiness_Status,Matched_Skills,All_Skills,Lockout_Status,LinkedIn_URL,GitHub_Search,Other_Portals_Search,Contact_Dork\\n';
     currentCandidates.forEach(function(c, i) {
+        var liUrl = c.linkedin || ('https://www.google.com/search?q=' + encodeURIComponent(c.name + ' ' + (c.company || '') + ' site:linkedin.com/in'));
+        var ghUrl = 'https://www.google.com/search?q=' + encodeURIComponent(c.name + ' site:github.com');
+        var founditUrl = 'https://www.google.com/search?q=' + encodeURIComponent(c.name + ' ' + (c.company || '') + ' site:foundit.in');
+        var dorkUrl = 'https://www.google.com/search?q=' + encodeURIComponent(c.name + ' "' + (c.company || '') + '" ("email" OR "phone" OR "resume" OR "@gmail.com")');
+
         var row = [
             i + 1,
             c.match_score + '%',
@@ -587,7 +596,10 @@ function exportCSV() {
             '"' + ((c.matched_skills || []).join(', ')).replace(/"/g, '""') + '"',
             '"' + ((c.skills || []).join(', ')).replace(/"/g, '""') + '"',
             c.is_locked ? 'LOCKED' : 'FRESH_SAFE',
-            '"' + (c.linkedin || '') + '"'
+            '"' + liUrl + '"',
+            '"' + ghUrl + '"',
+            '"' + founditUrl + '"',
+            '"' + dorkUrl + '"'
         ];
         csv += row.join(',') + '\\n';
     });

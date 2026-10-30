@@ -660,11 +660,9 @@ function renderTable(candidates) {
 
         var phoneHtml = c.phone ? ('📞 <a href="tel:' + c.phone + '" style="color:#047857;font-weight:700;">' + c.phone + '</a>') : '<span style="color:#94a3b8;font-size:12px;">Phone: <i>Not in CSV</i></span>';
         var emailHtml = c.email ? ('✉️ <a href="mailto:' + c.email + '" style="color:#0284c7;font-weight:700;">' + c.email + '</a>') : '<span style="color:#94a3b8;font-size:12px;">Email: <i>Not in CSV</i></span>';
-        var safeName = (c.name || '').replace(/["']/g, '');
-        var safeComp = (c.company || '').replace(/["']/g, '');
         var contactBlock = '<div id="contact-info-' + i + '" style="font-size:12px;line-height:1.6;">' + 
             phoneHtml + '<br>' + emailHtml + 
-            '<div style="margin-top:6px;"><button id="btn-fetch-' + i + '" onclick="fetchLiveContact(\'' + safeName + '\', \'' + safeComp + '\', ' + i + ')" class="link-btn" style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:3px 8px;font-size:11px;cursor:pointer;">⚡ Live Web Scan</button></div>' +
+            '<div style="margin-top:6px;"><button id="btn-fetch-' + i + '" data-idx="' + i + '" class="link-btn btn-live-fetch" style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:3px 8px;font-size:11px;cursor:pointer;">⚡ Live Web Scan</button></div>' +
         '</div>';
 
         html += '<tr>' +
@@ -697,6 +695,18 @@ function renderTable(candidates) {
         '</tr>';
     });
     tbody.innerHTML = html;
+
+    // Attach event listeners safely without inline onclick strings
+    var scanButtons = tbody.querySelectorAll('.btn-live-fetch');
+    scanButtons.forEach(function(b) {
+        b.addEventListener('click', function() {
+            var idx = parseInt(this.getAttribute('data-idx'));
+            var cand = currentCandidates[idx];
+            if (cand) {
+                fetchLiveContact(cand.name || '', cand.company || '', idx);
+            }
+        });
+    });
 }
 
 function fetchLiveContact(name, company, index) {

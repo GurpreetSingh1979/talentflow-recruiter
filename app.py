@@ -646,13 +646,17 @@ function renderTable(candidates) {
         '</div>';
 
         var liUrl = c.linkedin || ('https://www.google.com/search?q=' + encodeURIComponent(c.name + ' ' + (c.company || '') + ' site:linkedin.com/in'));
+        var googleDorkUrl = 'https://www.google.com/search?q=' + encodeURIComponent('"' + c.name + '" "' + (c.company || '') + '" ("email" OR "phone" OR "resume" OR "@gmail.com")');
+        var bingDorkUrl = 'https://www.bing.com/search?q=' + encodeURIComponent('"' + c.name + '" "' + (c.company || '') + '" ("email" OR "phone" OR "resume" OR "@gmail.com")');
         var githubUrl = 'https://www.google.com/search?q=' + encodeURIComponent(c.name + ' site:github.com');
-        var founditUrl = 'https://www.google.com/search?q=' + encodeURIComponent(c.name + ' ' + (c.company || '') + ' site:foundit.in');
-        var contactQuery = encodeURIComponent(c.name + ' "' + (c.company || '') + '" ("email" OR "phone" OR "resume" OR "@gmail.com")');
+        var portalsUrl = 'https://www.google.com/search?q=' + encodeURIComponent('"' + c.name + '" ("foundit.in" OR "indeed.com" OR "shine.com")');
 
-        var phoneHtml = c.phone ? ('📞 <a href="tel:' + c.phone + '" style="color:#047857;font-weight:700;">' + c.phone + '</a>') : '<span style="color:#94a3b8;font-size:12px;">Phone: <i>Not public</i></span>';
-        var emailHtml = c.email ? ('✉️ <a href="mailto:' + c.email + '" style="color:#0284c7;font-weight:700;">' + c.email + '</a>') : '<span style="color:#94a3b8;font-size:12px;">Email: <i>Not public</i></span>';
-        var contactBlock = '<div style="font-size:12px;line-height:1.6;">' + phoneHtml + '<br>' + emailHtml + '</div>';
+        var phoneHtml = c.phone ? ('📞 <a href="tel:' + c.phone + '" style="color:#047857;font-weight:700;">' + c.phone + '</a>') : '<span style="color:#94a3b8;font-size:12px;">Phone: <i>Not in CSV</i></span>';
+        var emailHtml = c.email ? ('✉️ <a href="mailto:' + c.email + '" style="color:#0284c7;font-weight:700;">' + c.email + '</a>') : '<span style="color:#94a3b8;font-size:12px;">Email: <i>Not in CSV</i></span>';
+        var contactBlock = '<div id="contact-info-' + i + '" style="font-size:12px;line-height:1.6;">' + 
+            phoneHtml + '<br>' + emailHtml + 
+            '<div style="margin-top:6px;"><button id="btn-fetch-' + i + '" onclick="fetchLiveContact(\'' + c.name.replace(/'/g, "\\'") + '\', \'' + (c.company || '').replace(/'/g, "\\'") + '\', ' + i + ')" class="link-btn" style="background:#e0e7ff;color:#3730a3;border:1px solid #c7d2fe;padding:3px 8px;font-size:11px;cursor:pointer;">⚡ Live Web Scan</button></div>' +
+        '</div>';
 
         html += '<tr>' +
             '<td><b style="color:#64748b;">#' + (i + 1) + '</b></td>' +
@@ -675,8 +679,10 @@ function renderTable(candidates) {
             '<td>' +
                 '<div class="action-links">' +
                     '<a class="link-btn link-li" href="' + liUrl + '" target="_blank">🔗 LinkedIn</a>' +
+                    '<a class="link-btn link-search" href="' + googleDorkUrl + '" target="_blank">🌐 Google Dork</a>' +
+                    '<a class="link-btn link-search" href="' + bingDorkUrl + '" target="_blank">🔎 Bing Dork</a>' +
                     '<a class="link-btn link-search" href="' + githubUrl + '" target="_blank">🐙 GitHub</a>' +
-                    '<a class="link-btn link-search" href="' + founditUrl + '" target="_blank">🔍 Foundit</a>' +
+                    '<a class="link-btn link-search" href="' + portalsUrl + '" target="_blank">📑 Foundit/Indeed</a>' +
                 '</div>' +
             '</td>' +
         '</tr>';
@@ -951,18 +957,40 @@ def api_find_candidate_contact():
     phone = ""
     email = ""
     linkedin = ""
+    github = ""
+
+    # Multi-engine / Multi-query search: LinkedIn, GitHub, Foundit, Indeed, and Web Portals
+    queries = [
+        f'"{name}" "{company}" email OR phone OR contact OR resume OR gmail.com site:linkedin.com/in',
+        f'"{name}" "{company}" email OR phone OR contact OR resume OR gmail.com',
+        f'"{name}" site:github.com',
+        f'"{name}" "{company}" site:foundit.in OR site:indeed.com'
+    ]
 
     try:
         from ddgs import DDGS
         with DDGS() as ddgs:
-            q = f'"{name}" "{company}" email OR phone OR contact OR resume OR gmail.com site:linkedin.com/in'
-            results = list(ddgs.text(q, max_results=3))
-            full_text = " ".join([r.get("title", "") + " " + r.get("body", "") for r in results])
-            phone, email = extract_phone_and_email(full_text)
-            for r in results:
-                href = r.get("href", "")
-                if "linkedin.com/in/" in href and not linkedin:
-                    linkedin = href
+            for q in queries:
+                try:
+                    results = list(ddgs.text(q, max_results=3))
+                    full_text = " ".join([r.get("title", "") + " " + r.get("body", "") for r in results])
+                    p, e = extract_phone_and_email(full_text)
+                    if not phone and p:
+                        phone = p
+                    if not email and e:
+                        email = e
+
+                    for r in results:
+                        href = r.get("href", "")
+                        if "linkedin.com/in/" in href and not linkedin:
+                            linkedin = href
+                        if "github.com/" in href and not github and not any(x in href for x in ["/topics", "/search", "/features", "/pricing"]):
+                            github = href
+
+                    if phone and email and linkedin:
+                        break
+                except Exception:
+                    continue
     except Exception as e:
         pass
 
@@ -971,7 +999,8 @@ def api_find_candidate_contact():
         "name": name,
         "phone": phone or "Not found publicly",
         "email": email or "Not found publicly",
-        "linkedin": linkedin
+        "linkedin": linkedin,
+        "github": github
     })
 
 if __name__ == "__main__":

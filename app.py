@@ -864,8 +864,11 @@ def api_screen_candidates():
                 role = get_val(row, "Current_Role", "Current Role", "Current_Role_Company", "Role", "Designation", "Job Title")
                 exp = get_val(row, "Experience", "Total Experience", "Exp", "Work Experience")
                 loc = get_val(row, "Location", "Current Location", "City")
-                skills_raw = get_val(row, "Key_Skills", "Key Skills", "Skills", "Matched_JD_Skills", "Skillset")
+                skills_raw = get_val(row, "All_Skills", "Key_Skills", "Key Skills", "Skills", "Matched_Skills", "Matched_JD_Skills", "Skillset")
                 notice = get_val(row, "Notice_Period", "Notice Period", "Notice")
+                phone_col = get_val(row, "Phone", "Mobile", "Contact", "Discovered_Phone", "Phone_Number")
+                email_col = get_val(row, "Email", "Mail", "Email_Address", "Discovered_Email")
+                comp_col = get_val(row, "Company", "Current_Company", "Organization", "Employer")
 
                 exp_years = 0.0
                 m = re.search(r"(\d+)y\s*(\d*)m?", exp, re.I)
@@ -888,11 +891,15 @@ def api_screen_candidates():
                 if fresh_only and is_locked:
                     continue
 
-                comp = ""
-                if " at " in role:
+                comp = comp_col
+                if not comp and " at " in role:
                     comp = role.split(" at ")[-1].strip()
 
                 phone_raw, email_raw = extract_phone_and_email(f"{skills_raw} {name} {role}")
+                if not phone_raw and phone_col:
+                    phone_raw = phone_col
+                if not email_raw and email_col:
+                    email_raw = email_col
                 radar_type, radar_label = evaluate_readiness(notice, role, skills_raw)
                 parsed_skills = [s.strip() for s in skills_raw.replace("|;", ",").replace("|", ",").split(",") if s.strip() and len(s.strip()) < 35]
                 li_url = row.get("LinkedIn_Search", f"https://www.google.com/search?q={name}+{comp}+site%3Alinkedin.com%2Fin")

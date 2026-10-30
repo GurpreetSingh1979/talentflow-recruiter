@@ -342,19 +342,20 @@ HTML_TEMPLATE = """
             <table>
                 <thead>
                     <tr>
-                        <th style="width:60px;">#</th>
-                        <th style="width:110px;">Fit Score</th>
-                        <th style="width:280px;">Candidate & Role</th>
-                        <th style="width:170px;">Experience & City</th>
-                        <th style="width:240px;">Availability & Intent</th>
+                        <th style="width:50px;">#</th>
+                        <th style="width:100px;">Fit Score</th>
+                        <th style="width:240px;">Candidate & Role</th>
+                        <th style="width:140px;">Exp & City</th>
+                        <th style="width:170px;">📞 Phone & Email</th>
+                        <th style="width:200px;">Availability & Intent</th>
                         <th>Skills Matched</th>
-                        <th style="width:150px;">Lockout Status</th>
-                        <th style="width:180px;">One-Click Contact</th>
+                        <th style="width:130px;">Lockout</th>
+                        <th style="width:150px;">Online Profiles</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
                     <tr>
-                        <td colspan="8" style="text-align: center; color: var(--text-muted); padding: 50px;">
+                        <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 50px;">
                             Click <b>📤 Upload Candidate CSV</b> to upload a batch or <b>⚡ Re-Screen</b> to load existing candidates.
                         </td>
                     </tr>
@@ -542,12 +543,25 @@ function autoLoad() {
             btn.innerHTML = '⚡ Re-Screen';
 
             if (!data.success) {
+                // Try loading from localStorage if server has no uploaded file
+                var cached = localStorage.getItem('tf_last_candidates');
+                if (cached) {
+                    try {
+                        var parsed = JSON.parse(cached);
+                        currentCandidates = parsed;
+                        renderTable(parsed);
+                        document.getElementById('countTotal').innerText = parsed.length;
+                        showBanner('ℹ️ Restored ' + parsed.length + ' candidates from your previous session.', 'info');
+                        return;
+                    } catch(e) {}
+                }
                 showBanner('ℹ️ ' + data.error, 'info');
                 return;
             }
 
             currentCandidates = data.candidates || [];
             currentJD = data.jd_title || '';
+            localStorage.setItem('tf_last_candidates', JSON.stringify(currentCandidates));
 
             var total = currentCandidates.length;
             var locked = currentCandidates.filter(c => c.is_locked).length;
@@ -571,7 +585,16 @@ function autoLoad() {
         .catch(err => {
             btn.disabled = false;
             btn.innerHTML = '⚡ Re-Screen';
-            showBanner('Screening failed: ' + err.message, 'error');
+            var cached = localStorage.getItem('tf_last_candidates');
+            if (cached) {
+                var parsed = JSON.parse(cached);
+                currentCandidates = parsed;
+                renderTable(parsed);
+                document.getElementById('countTotal').innerText = parsed.length;
+                showBanner('Loaded ' + parsed.length + ' saved candidates.', 'info');
+            } else {
+                showBanner('Screening failed: ' + err.message, 'error');
+            }
         });
 }
 
@@ -623,6 +646,10 @@ function renderTable(candidates) {
         var founditUrl = 'https://www.google.com/search?q=' + encodeURIComponent(c.name + ' ' + (c.company || '') + ' site:foundit.in');
         var contactQuery = encodeURIComponent(c.name + ' "' + (c.company || '') + '" ("email" OR "phone" OR "resume" OR "@gmail.com")');
 
+        var phoneHtml = c.phone ? ('📞 <a href="tel:' + c.phone + '" style="color:#047857;font-weight:700;">' + c.phone + '</a>') : '<span style="color:#94a3b8;font-size:12px;">Phone: <i>Not public</i></span>';
+        var emailHtml = c.email ? ('✉️ <a href="mailto:' + c.email + '" style="color:#0284c7;font-weight:700;">' + c.email + '</a>') : '<span style="color:#94a3b8;font-size:12px;">Email: <i>Not public</i></span>';
+        var contactBlock = '<div style="font-size:12px;line-height:1.6;">' + phoneHtml + '<br>' + emailHtml + '</div>';
+
         html += '<tr>' +
             '<td><b style="color:#64748b;">#' + (i + 1) + '</b></td>' +
             '<td>' + scoreBadge + '</td>' +
@@ -637,16 +664,15 @@ function renderTable(candidates) {
                 '<div style="font-weight:600;">⏱️ ' + (c.exp || 'N/A') + '</div>' +
                 '<div style="font-size:12px;color:var(--text-muted);margin-top:3px;">📍 ' + (c.location || 'Pan India') + '</div>' +
             '</td>' +
+            '<td>' + contactBlock + '</td>' +
             '<td>' + radarHtml + '</td>' +
             '<td>' + (skillsHtml || '<span style="color:var(--text-muted);font-size:12px;">Matched on experience</span>') + '</td>' +
             '<td>' + lockBadge + '</td>' +
             '<td>' +
                 '<div class="action-links">' +
-                    '<a class="link-btn link-li" href="' + liUrl + '" target="_blank">🔗 LinkedIn Profile</a>' +
-                    '<a class="link-btn link-search" href="' + githubUrl + '" target="_blank">🐙 GitHub / Portfolio</a>' +
-                    '<a class="link-btn link-search" href="' + founditUrl + '" target="_blank">🔍 Other Portals (Foundit)</a>' +
-                    '<button class="link-btn" id="btn-fetch-' + i + '" style="background:#059669;color:#fff;border:none;cursor:pointer;" onclick="fetchLiveContact(\'' + c.name.replace(/'/g, "\\'") + '\', \'' + (c.company || '').replace(/'/g, "\\'") + '\', ' + i + ')">⚡ Get Phone/Email</button>' +
-                    '<div id="contact-info-' + i + '" style="font-size:11px;color:#0f172a;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:6px;padding:6px;margin-top:4px;display:none;text-align:left;"></div>' +
+                    '<a class="link-btn link-li" href="' + liUrl + '" target="_blank">🔗 LinkedIn</a>' +
+                    '<a class="link-btn link-search" href="' + githubUrl + '" target="_blank">🐙 GitHub</a>' +
+                    '<a class="link-btn link-search" href="' + founditUrl + '" target="_blank">🔍 Foundit</a>' +
                 '</div>' +
             '</td>' +
         '</tr>';
@@ -845,6 +871,7 @@ def api_screen_candidates():
                 if " at " in role:
                     comp = role.split(" at ")[-1].strip()
 
+                phone_raw, email_raw = extract_phone_and_email(f"{skills_raw} {name} {role}")
                 radar_type, radar_label = evaluate_readiness(notice, role, skills_raw)
                 parsed_skills = [s.strip() for s in skills_raw.replace("|;", ",").replace("|", ",").split(",") if s.strip() and len(s.strip()) < 35]
                 li_url = row.get("LinkedIn_Search", f"https://www.google.com/search?q={name}+{comp}+site%3Alinkedin.com%2Fin")
@@ -856,6 +883,8 @@ def api_screen_candidates():
                     "company": comp,
                     "exp": exp,
                     "location": loc or "Pan India",
+                    "phone": phone_raw,
+                    "email": email_raw,
                     "notice": notice,
                     "radar_type": radar_type,
                     "radar_label": radar_label,

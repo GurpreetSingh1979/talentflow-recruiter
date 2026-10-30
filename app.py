@@ -577,11 +577,18 @@ function autoLoad() {
             document.getElementById('countImmediate').innerText = immediate;
             document.getElementById('countLocked').innerText = locked;
 
-            showBanner('✅ Loaded <b>' + total + ' Candidates</b> from ' + data.filename + ' (0 portal credits used)', 'success');
-            document.getElementById('statsText').innerHTML = 'Displaying <b>' + total + '</b> best candidates for <b>' + currentJD + '</b>';
+            if (total === 0) {
+                showBanner('ℹ️ Uploaded <b>' + data.filename + '</b>, but 0 candidates met the current <b>' + minScore + '% score</b> filter for <b>' + currentJD + '</b>. Try lowering the match threshold to <b>70%</b> or <b>All Scores (0% - 100%)</b>.', 'info');
+                document.getElementById('statsText').innerHTML = '0 candidates match the <b>' + minScore + '%</b> threshold for <b>' + currentJD + '</b>. Lower the threshold dropdown to see all uploaded candidates.';
+            } else {
+                showBanner('✅ Loaded <b>' + total + ' Candidates</b> from ' + data.filename + ' (0 portal credits used)', 'success');
+                document.getElementById('statsText').innerHTML = 'Displaying <b>' + total + '</b> best candidates for <b>' + currentJD + '</b>';
+            }
 
             if (total > 0) {
                 document.getElementById('btnExport').style.display = 'inline-flex';
+            } else {
+                document.getElementById('btnExport').style.display = 'none';
             }
 
             renderTable(currentCandidates);

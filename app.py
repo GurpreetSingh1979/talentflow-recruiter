@@ -285,11 +285,16 @@ HTML_TEMPLATE = """
         <div class="filter-controls">
             <div class="filter-item">
                 <label>1. Select Job Role (JD)</label>
-                <select id="jdSelect" onchange="autoLoad()">
-                    {% for jd in jds %}
-                    <option value="{{ jd.filename }}">{{ jd.title }}</option>
-                    {% endfor %}
-                </select>
+                <div style="display:flex;gap:8px;">
+                    <select id="jdSelect" onchange="autoLoad()">
+                        {% for jd in jds %}
+                        <option value="{{ jd.filename }}">{{ jd.title }}</option>
+                        {% endfor %}
+                    </select>
+                    <button onclick="openCreateJDModal()" class="btn" style="background:#0284c7;color:#fff;padding:8px 12px;font-size:12px;" title="Add New Role / JD">
+                        ➕ New Role
+                    </button>
+                </div>
             </div>
 
             <div class="filter-item">
@@ -386,6 +391,43 @@ HTML_TEMPLATE = """
     </div>
 </div>
 
+<div id="createJDModal" style="display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#fff;border-radius:14px;max-width:550px;width:90%;padding:28px;box-shadow:0 20px 40px rgba(0,0,0,0.3);">
+        <h2 style="font-size:18px;font-weight:800;color:#0f172a;margin-bottom:6px;">➕ Add Fresh Role / Job Description</h2>
+        <p style="font-size:13px;color:#64748b;margin-bottom:18px;">Create a new role so the bot can automatically score incoming candidates against it.</p>
+
+        <div style="display:flex;flex-direction:column;gap:12px;">
+            <div>
+                <label style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;">Client / Account Name</label>
+                <input type="text" id="newClient" placeholder="e.g. LTIMINDTREE, CAPGEMINI, TCS" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;margin-top:4px;">
+            </div>
+            <div>
+                <label style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;">Job Title / Role</label>
+                <input type="text" id="newRole" placeholder="e.g. AWS DevOps Engineer, React Developer" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;margin-top:4px;">
+            </div>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+                <div>
+                    <label style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;">Min Experience (Yrs)</label>
+                    <input type="number" id="newMinExp" value="3" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;margin-top:4px;">
+                </div>
+                <div>
+                    <label style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;">Max Experience (Yrs)</label>
+                    <input type="number" id="newMaxExp" value="8" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;margin-top:4px;">
+                </div>
+            </div>
+            <div>
+                <label style="font-size:11px;font-weight:700;color:#475569;text-transform:uppercase;">Mandatory Skills (Comma-Separated)</label>
+                <input type="text" id="newSkills" placeholder="e.g. Docker, Kubernetes, Terraform, CI/CD, Python" style="width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px;font-size:13px;margin-top:4px;">
+            </div>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:10px;margin-top:22px;">
+            <button onclick="closeCreateJDModal()" class="btn" style="background:#f1f5f9;color:#475569;padding:9px 16px;">Cancel</button>
+            <button onclick="saveNewJD()" class="btn btn-primary" style="padding:9px 20px;">Save & Activate Role</button>
+        </div>
+    </div>
+</div>
+
 <script>
 var bookmarkletCode = "";
 fetch('/api/get-bookmarklet')
@@ -394,6 +436,43 @@ fetch('/api/get-bookmarklet')
         bookmarkletCode = d.code;
         document.getElementById('dragBookmarklet').href = bookmarkletCode;
     });
+
+function openCreateJDModal() {
+    document.getElementById('createJDModal').style.display = 'flex';
+}
+function closeCreateJDModal() {
+    document.getElementById('createJDModal').style.display = 'none';
+}
+function saveNewJD() {
+    var client = document.getElementById('newClient').value.trim();
+    var role = document.getElementById('newRole').value.trim();
+    var minExp = document.getElementById('newMinExp').value.trim();
+    var maxExp = document.getElementById('newMaxExp').value.trim();
+    var skills = document.getElementById('newSkills').value.trim();
+
+    if (!client || !role || !skills) {
+        alert("Please fill in Client Name, Role, and Mandatory Skills.");
+        return;
+    }
+
+    fetch('/api/create-jd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ client: client, role: role, min_exp: minExp, max_exp: maxExp, skills: skills })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (!d.success) {
+            alert("Error: " + d.error);
+            return;
+        }
+        alert("✅ Role '" + role + "' created successfully!");
+        closeCreateJDModal();
+        window.location.reload();
+    })
+    .catch(err => alert("Failed to save: " + err.message));
+}
+
 
 function openInstallModal() {
     document.getElementById('installModal').style.display = 'flex';
@@ -566,12 +645,49 @@ function renderTable(candidates) {
                     '<a class="link-btn link-li" href="' + liUrl + '" target="_blank">🔗 LinkedIn Profile</a>' +
                     '<a class="link-btn link-search" href="' + githubUrl + '" target="_blank">🐙 GitHub / Portfolio</a>' +
                     '<a class="link-btn link-search" href="' + founditUrl + '" target="_blank">🔍 Other Portals (Foundit)</a>' +
-                    '<a class="link-btn" style="background:#059669;color:#fff;" href="https://www.google.com/search?q=' + contactQuery + '" target="_blank">📞 Phone & Email Dork</a>' +
+                    '<button class="link-btn" id="btn-fetch-' + i + '" style="background:#059669;color:#fff;border:none;cursor:pointer;" onclick="fetchLiveContact(\'' + c.name.replace(/'/g, "\\'") + '\', \'' + (c.company || '').replace(/'/g, "\\'") + '\', ' + i + ')">⚡ Get Phone/Email</button>' +
+                    '<div id="contact-info-' + i + '" style="font-size:11px;color:#0f172a;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:6px;padding:6px;margin-top:4px;display:none;text-align:left;"></div>' +
                 '</div>' +
             '</td>' +
         '</tr>';
     });
     tbody.innerHTML = html;
+}
+
+function fetchLiveContact(name, company, index) {
+    var btn = document.getElementById('btn-fetch-' + index);
+    var box = document.getElementById('contact-info-' + index);
+    btn.disabled = true;
+    btn.innerHTML = '⏳ Searching Web...';
+
+    fetch('/api/find-candidate-contact?name=' + encodeURIComponent(name) + '&company=' + encodeURIComponent(company))
+        .then(r => r.json())
+        .then(d => {
+            btn.style.display = 'none';
+            box.style.display = 'block';
+            var html = '';
+            if (d.phone && d.phone !== 'Not found publicly') {
+                html += '📞 <b>Phone:</b> <a href="tel:' + d.phone + '" style="color:#047857;font-weight:700;">' + d.phone + '</a><br>';
+            } else {
+                html += '📞 <b>Phone:</b> <span style="color:#64748b;">Not public</span><br>';
+            }
+
+            if (d.email && d.email !== 'Not found publicly') {
+                html += '✉️ <b>Email:</b> <a href="mailto:' + d.email + '" style="color:#047857;font-weight:700;">' + d.email + '</a>';
+            } else {
+                html += '✉️ <b>Email:</b> <span style="color:#64748b;">Not public</span>';
+            }
+
+            if (d.linkedin) {
+                html += '<br>🔗 <a href="' + d.linkedin + '" target="_blank" style="color:#0a66c2;font-weight:700;">Verified LinkedIn</a>';
+            }
+            box.innerHTML = html;
+        })
+        .catch(err => {
+            btn.disabled = false;
+            btn.innerHTML = '⚡ Get Phone/Email';
+            alert("Search failed: " + err.message);
+        });
 }
 
 function exportCSV() {
@@ -634,6 +750,33 @@ def api_get_bookmarklet():
         with open(b_path, "r", encoding="utf-8") as f:
             code = f.read().strip()
     return jsonify({"code": code})
+
+@app.route("/api/create-jd", methods=["POST"])
+def api_create_jd():
+    data = request.get_json() or {}
+    client = data.get("client", "").strip().upper()
+    role = data.get("role", "").strip()
+    min_exp = data.get("min_exp", "3").strip()
+    max_exp = data.get("max_exp", "8").strip()
+    skills = data.get("skills", "").strip()
+
+    if not client or not role or not skills:
+        return jsonify({"success": False, "error": "Missing required fields"})
+
+    safe_title = re.sub(r'[^a-zA-Z0-9_]', '_', f"{client}_{role}").strip('_')
+    filename = f"{safe_title}.txt"
+    filepath = os.path.join(JD_DIR, filename)
+
+    content = f"""Target Client: {client}
+Role: {role}
+Experience: {min_exp} to {max_exp} Years
+Mandatory Skills: {skills}
+Notice Period: Immediate to 30 Days
+"""
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(content)
+
+    return jsonify({"success": True, "filename": filename})
 
 @app.route("/api/upload-csv", methods=["POST"])
 def upload_csv():
@@ -734,6 +877,55 @@ def api_screen_candidates():
     except Exception as e:
         return jsonify({"success": False, "error": str(e)})
 
-if __name__ == "__main__":
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
+def extract_phone_and_email(text):
+    if not text:
+        return "", ""
+    phones = re.findall(r'(?:\+?91[\s\-]?)?[6789]\d{9}', text)
+    valid_phones = []
+    for p in phones:
+        clean = re.sub(r'[^\d]', '', p)
+        if len(clean) == 10 and clean[0] in '6789':
+            valid_phones.append(clean)
+        elif len(clean) == 12 and clean.startswith('91') and clean[2] in '6789':
+            valid_phones.append('+' + clean)
+
+    emails = re.findall(r'[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+', text)
+    blacklist = ['example.com', 'domain.com', 'sentry.io', 'w3.org', 'company.com', 'email.com', 'yourcompany.com', 'naukri.com']
+    valid_emails = [e.lower() for e in emails if not any(b in e.lower() for b in blacklist)]
+
+    phone_str = list(dict.fromkeys(valid_phones))[0] if valid_phones else ""
+    email_str = list(dict.fromkeys(valid_emails))[0] if valid_emails else ""
+    return phone_str, email_str
+
+@app.route("/api/find-candidate-contact", methods=["GET"])
+def api_find_candidate_contact():
+    name = request.args.get("name", "").strip()
+    company = request.args.get("company", "").strip()
+    if not name:
+        return jsonify({"success": False, "error": "Name required"})
+
+    phone = ""
+    email = ""
+    linkedin = ""
+
+    try:
+        from ddgs import DDGS
+        with DDGS() as ddgs:
+            q = f'"{name}" "{company}" email OR phone OR contact OR resume OR gmail.com site:linkedin.com/in'
+            results = list(ddgs.text(q, max_results=3))
+            full_text = " ".join([r.get("title", "") + " " + r.get("body", "") for r in results])
+            phone, email = extract_phone_and_email(full_text)
+            for r in results:
+                href = r.get("href", "")
+                if "linkedin.com/in/" in href and not linkedin:
+                    linkedin = href
+    except Exception as e:
+        pass
+
+    return jsonify({
+        "success": True,
+        "name": name,
+        "phone": phone or "Not found publicly",
+        "email": email or "Not found publicly",
+        "linkedin": linkedin
+    })

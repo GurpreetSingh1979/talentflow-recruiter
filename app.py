@@ -487,7 +487,7 @@ function deleteCurrentJD() {
     var filename = select.value;
     var title = select.options[select.selectedIndex].text;
 
-    if (!confirm("Are you sure you want to delete role:\n\"" + title + "\"?\nThis cannot be undone.")) {
+    if (!confirm("Are you sure you want to delete role: " + title + "? This cannot be undone.")) {
         return;
     }
 

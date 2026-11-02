@@ -291,8 +291,11 @@ HTML_TEMPLATE = """
                         <option value="{{ jd.filename }}">{{ jd.title }}</option>
                         {% endfor %}
                     </select>
-                    <button onclick="openCreateJDModal()" class="btn" style="background:#0284c7;color:#fff;padding:8px 12px;font-size:12px;" title="Add New Role / JD">
+                    <button onclick="openCreateJDModal()" class="btn" style="background:#0284c7;color:#fff;padding:8px 12px;font-size:12px;white-space:nowrap;" title="Add New Role / JD">
                         ➕ New Role
+                    </button>
+                    <button onclick="deleteCurrentJD()" class="btn" style="background:#ef4444;color:#fff;padding:8px 12px;font-size:12px;white-space:nowrap;" title="Delete Selected Role / JD">
+                        🗑️ Delete Role
                     </button>
                 </div>
             </div>
@@ -473,6 +476,36 @@ function saveNewJD() {
         window.location.reload();
     })
     .catch(err => alert("Failed to save: " + err.message));
+}
+
+function deleteCurrentJD() {
+    var select = document.getElementById('jdSelect');
+    if (!select || !select.value) {
+        alert("Please select a Job Role to delete.");
+        return;
+    }
+    var filename = select.value;
+    var title = select.options[select.selectedIndex].text;
+
+    if (!confirm("Are you sure you want to delete role:\n\"" + title + "\"?\nThis cannot be undone.")) {
+        return;
+    }
+
+    fetch('/api/delete-jd', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filename: filename })
+    })
+    .then(r => r.json())
+    .then(d => {
+        if (!d.success) {
+            alert("Error: " + (d.error || "Failed to delete role"));
+            return;
+        }
+        alert("🗑️ Role '" + title + "' deleted successfully!");
+        window.location.reload();
+    })
+    .catch(err => alert("Failed to delete role: " + err.message));
 }
 
 
@@ -818,6 +851,29 @@ Notice Period: Immediate to 30 Days
         f.write(content)
 
     return jsonify({"success": True, "filename": filename})
+
+@app.route("/api/delete-jd", methods=["POST"])
+def api_delete_jd():
+    data = request.get_json() or {}
+    filename = data.get("filename", "").strip()
+
+    if not filename:
+        return jsonify({"success": False, "error": "No filename specified"}), 400
+
+    # Prevent directory traversal attacks
+    safe_name = os.path.basename(filename)
+    if not safe_name.endswith(".txt"):
+        return jsonify({"success": False, "error": "Invalid JD filename"}), 400
+
+    filepath = os.path.join(JD_DIR, safe_name)
+    if not os.path.exists(filepath):
+        return jsonify({"success": False, "error": "Role file not found"}), 404
+
+    try:
+        os.remove(filepath)
+        return jsonify({"success": True, "message": f"Deleted {safe_name}"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route("/api/upload-csv", methods=["POST"])
 def upload_csv():

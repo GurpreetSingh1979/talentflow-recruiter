@@ -269,10 +269,10 @@ HTML_TEMPLATE = """
             <div class="stat-val" style="color:var(--green);" id="countFresh">0</div>
             <div class="stat-desc">Zero 180-day lockout collision</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card" onclick="filterByImmediate()" style="cursor:pointer;transition:transform 0.15s;" title="Click to show only Serving Notice / Immediate candidates">
             <div class="stat-label">⚡ Serving Notice / Immediate</div>
             <div class="stat-val" style="color:#0284c7;" id="countImmediate">0</div>
-            <div class="stat-desc">High-intent fast closures</div>
+            <div class="stat-desc">Click card to filter this batch ⚡</div>
         </div>
         <div class="stat-card">
             <div class="stat-label">🔒 Duplicates Prevented</div>
@@ -628,6 +628,17 @@ function autoLoad() {
         });
 }
 
+function filterByImmediate() {
+    var searchInput = document.getElementById('quickSearch');
+    if (searchInput.value.toLowerCase() === 'notice' || searchInput.value.toLowerCase() === 'immediate') {
+        searchInput.value = '';
+        renderTable(currentCandidates);
+    } else {
+        searchInput.value = 'notice';
+        filterLive();
+    }
+}
+
 function filterLive() {
     var q = document.getElementById('quickSearch').value.toLowerCase();
     if (!q) {
@@ -638,7 +649,9 @@ function filterLive() {
         return (c.name || '').toLowerCase().includes(q) ||
                (c.role || '').toLowerCase().includes(q) ||
                (c.company || '').toLowerCase().includes(q) ||
-               (c.location || '').toLowerCase().includes(q);
+               (c.location || '').toLowerCase().includes(q) ||
+               (c.notice || '').toLowerCase().includes(q) ||
+               (c.radar_label || '').toLowerCase().includes(q);
     });
     renderTable(filtered);
 }

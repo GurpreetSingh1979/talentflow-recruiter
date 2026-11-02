@@ -300,9 +300,10 @@ HTML_TEMPLATE = """
             <div class="filter-item">
                 <label>2. Match Threshold</label>
                 <select id="minScoreSelect" onchange="autoLoad()">
-                    <option value="80" selected>80% to 100% (Strict Best Matches)</option>
+                    <option value="50" selected>50% to 100% (Recommended Matches)</option>
+                    <option value="80">80% to 100% (Strict Best Matches)</option>
                     <option value="90">90% to 100% (Top Tier Only)</option>
-                    <option value="70">70% to 100% (Broader Pool)</option>
+                    <option value="70">70% to 100% (High Matches)</option>
                     <option value="0">All Scores (0% - 100%)</option>
                 </select>
             </div>
@@ -547,25 +548,19 @@ function autoLoad() {
             btn.innerHTML = '⚡ Re-Screen';
 
             if (!data.success) {
-                // Try loading from localStorage if server has no uploaded file
-                var cached = localStorage.getItem('tf_last_candidates');
-                if (cached) {
-                    try {
-                        var parsed = JSON.parse(cached);
-                        currentCandidates = parsed;
-                        renderTable(parsed);
-                        document.getElementById('countTotal').innerText = parsed.length;
-                        showBanner('ℹ️ Restored ' + parsed.length + ' candidates from your previous session.', 'info');
-                        return;
-                    } catch(e) {}
-                }
+                currentCandidates = [];
+                renderTable([]);
+                document.getElementById('countTotal').innerText = 0;
+                document.getElementById('countFresh').innerText = 0;
+                document.getElementById('countImmediate').innerText = 0;
+                document.getElementById('countLocked').innerText = 0;
+                document.getElementById('btnExport').style.display = 'none';
                 showBanner('ℹ️ ' + data.error, 'info');
                 return;
             }
 
             currentCandidates = data.candidates || [];
             currentJD = data.jd_title || '';
-            localStorage.setItem('tf_last_candidates', JSON.stringify(currentCandidates));
 
             var total = currentCandidates.length;
             var locked = currentCandidates.filter(c => c.is_locked).length;
@@ -578,8 +573,8 @@ function autoLoad() {
             document.getElementById('countLocked').innerText = locked;
 
             if (total === 0) {
-                showBanner('ℹ️ Uploaded <b>' + data.filename + '</b>, but 0 candidates met the current <b>' + minScore + '% score</b> filter for <b>' + currentJD + '</b>. Try lowering the match threshold to <b>70%</b> or <b>All Scores (0% - 100%)</b>.', 'info');
-                document.getElementById('statsText').innerHTML = '0 candidates match the <b>' + minScore + '%</b> threshold for <b>' + currentJD + '</b>. Lower the threshold dropdown to see all uploaded candidates.';
+                showBanner('ℹ️ Uploaded <b>' + data.filename + '</b>, but 0 candidates met the current <b>' + minScore + '% score</b> filter for <b>' + currentJD + '</b>. Try lowering the match threshold to <b>All Scores (0% - 100%)</b>.', 'info');
+                document.getElementById('statsText').innerHTML = '0 candidates match the <b>' + minScore + '%</b> threshold for <b>' + currentJD + '</b>. Select a lower threshold to view candidates.';
             } else {
                 showBanner('✅ Loaded <b>' + total + ' Candidates</b> from ' + data.filename + ' (0 portal credits used)', 'success');
                 document.getElementById('statsText').innerHTML = 'Displaying <b>' + total + '</b> best candidates for <b>' + currentJD + '</b>';
@@ -596,16 +591,7 @@ function autoLoad() {
         .catch(err => {
             btn.disabled = false;
             btn.innerHTML = '⚡ Re-Screen';
-            var cached = localStorage.getItem('tf_last_candidates');
-            if (cached) {
-                var parsed = JSON.parse(cached);
-                currentCandidates = parsed;
-                renderTable(parsed);
-                document.getElementById('countTotal').innerText = parsed.length;
-                showBanner('Loaded ' + parsed.length + ' saved candidates.', 'info');
-            } else {
-                showBanner('Screening failed: ' + err.message, 'error');
-            }
+            showBanner('Screening request failed: ' + err.message, 'error');
         });
 }
 
@@ -850,15 +836,19 @@ def upload_csv():
 @app.route("/api/screen-candidates", methods=["GET"])
 def api_screen_candidates():
     jd_filename = request.args.get("jd", "1_LTIMindtree_Salesforce_CPQ.txt")
-    min_score = int(request.args.get("min_score", 80))
+    min_score = int(request.args.get("min_score", 50))
     fresh_only = request.args.get("fresh_only", "true").lower() == "true"
 
     jd = parse_jd(jd_filename)
     jd_title = jd_filename.replace(".txt", "").replace("_", " ")
 
     latest_file = os.path.join(UPLOADS_DIR, "latest_candidates.csv")
+    default_seed = os.path.join(BASE_DIR, "default_candidates.csv")
     if not os.path.exists(latest_file):
-        return jsonify({"success": False, "error": "No candidate CSV has been uploaded yet. Please click 'Upload Candidate CSV' to get started."})
+        if os.path.exists(default_seed):
+            latest_file = default_seed
+        else:
+            return jsonify({"success": False, "error": "No candidate CSV has been uploaded yet. Please click 'Upload Candidate CSV' to get started."})
 
     candidates = []
     try:
@@ -894,13 +884,20 @@ def api_screen_candidates():
                 if m:
                     exp_years = round(int(m.group(1)) + (int(m.group(2) or 0) / 12.0), 1)
 
-                if exp_years > 0 and (exp_years < jd["min_exp"] - 0.5 or exp_years > jd["max_exp"] + 1.5):
-                    continue
-
                 full_text = f"{name} {role} {skills_raw}".lower()
                 matched = [s for s in jd["skills"] if re.search(r"\b" + re.escape(s.lower()) + r"\b", full_text)]
                 skill_score = int((len(matched) / max(len(jd["skills"]), 1)) * 60)
-                exp_score = 40 if (jd["min_exp"] <= exp_years <= jd["max_exp"]) else 25
+                
+                # Graduated experience scoring instead of hard exclusion
+                if jd["min_exp"] <= exp_years <= jd["max_exp"]:
+                    exp_score = 40
+                elif (jd["min_exp"] - 2.0) <= exp_years <= (jd["max_exp"] + 3.0):
+                    exp_score = 25
+                elif exp_years > 0:
+                    exp_score = 15
+                else:
+                    exp_score = 10
+
                 total_match = min(100, skill_score + exp_score)
 
                 if total_match < min_score:
